@@ -1,0 +1,10 @@
+pub mod department;
+pub mod employee;
+pub mod machine;
+pub mod note;
+pub mod permissions;
+pub mod problem;
+pub mod relations;
+pub mod shift;
+pub mod shift_problem;
+pub mod spare_part;
