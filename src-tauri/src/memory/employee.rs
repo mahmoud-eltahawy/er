@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use itertools::Itertools;
-use rec::model::{employee::Employee, name::Name};
+use rec::model::{employee::{Employee, Position}, name::Name, FromExt};
 use sqlx::{query, Pool, Sqlite};
 use uuid::Uuid;
 
@@ -521,14 +521,15 @@ pub async fn find_employee_by_id(pool: &Pool<Sqlite>, id: &Uuid) -> Result<Emplo
     .await?;
     let id = Uuid::from_str(&record.id)?;
     let department_id = Uuid::from_str(&record.department_id)?;
+    let position = Position::ext_from(record.position)?;
     Ok(Employee {
         id,
         department_id,
+        position,
         card_id: record.card_id,
         first_name: record.first_name,
         middle_name: record.middle_name,
         last_name: record.last_name,
-        position: record.position,
         password: record.password,
     })
 }
@@ -544,14 +545,15 @@ pub async fn find_employee_by_card(pool: &Pool<Sqlite>, card_id: i64) -> Result<
     .await?;
     let id = Uuid::from_str(&record.id)?;
     let department_id = Uuid::from_str(&record.department_id)?;
+    let position = Position::ext_from(record.position)?;
     Ok(Employee {
         id,
         department_id,
+        position,
         card_id: record.card_id,
         first_name: record.first_name,
         middle_name: record.middle_name,
         last_name: record.last_name,
-        position: record.position,
         password: record.password,
     })
 }

@@ -1,4 +1,4 @@
-use rec::model::employee::Employee;
+use rec::model::{employee::{Employee, Position}, Stringify};
 use sqlx::{query, Error, Pool, Sqlite};
 use uuid::Uuid;
 
@@ -36,6 +36,7 @@ pub async fn save(pool: &Pool<Sqlite>, employee: Employee, env: Env) -> Result<(
     let department_id = department_id.to_string();
     let updater_id = updater_id.to_string();
     let time_stamp = serde_json::json!(time_stamp).to_string();
+    let position = position.stringify();
     match query!(
         r#"
     INSERT INTO employee(id,card_id,department_id,first_name,
@@ -110,13 +111,15 @@ pub async fn update_password(
 
 pub async fn up(pool: &Pool<Sqlite>, employee_id: Uuid) -> Result<(), Error> {
     let employee_id = employee_id.to_string();
+    let position = Position::SuperUser.stringify();
     match query!(
         r#"
   UPDATE employee SET
-  position = 'SUPER_USER'
+  position = $2
   WHERE id = $1;
   "#,
         employee_id,
+        position,
     )
     .execute(pool)
     .await
@@ -128,13 +131,15 @@ pub async fn up(pool: &Pool<Sqlite>, employee_id: Uuid) -> Result<(), Error> {
 
 pub async fn down(pool: &Pool<Sqlite>, employee_id: Uuid) -> Result<(), Error> {
     let employee_id = employee_id.to_string();
+    let position = Position::SuperUser.stringify();
     match query!(
         r#"
   UPDATE employee SET
-  position = 'USER'
+  position = $2
   WHERE id = $1;
   "#,
         employee_id,
+        position,
     )
     .execute(pool)
     .await

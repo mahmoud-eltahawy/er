@@ -13,6 +13,8 @@ use login::Login;
 use shift_identity::ShiftIdentity;
 use major_update::MajorUpdate;
 
+use models::employee::Position;
+
 pub fn listen_to<T : DeserializeOwned + 'static>(event_name : String,action : impl Fn(Event<T>) + 'static) {
     spawn_local(async move {
         if let Ok(events) = listen(&event_name).await {
@@ -98,7 +100,7 @@ pub fn App(cx: Scope) -> impl IntoView {
         let id = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {
-                set_employee.set(Some(Employee{position : "SUPER_USER".to_string(),..employee}))
+                set_employee.set(Some(Employee{position : Position::SuperUser,..employee}))
             }
         }
     });
@@ -106,7 +108,7 @@ pub fn App(cx: Scope) -> impl IntoView {
         let id = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {
-                set_employee.set(Some(Employee{position : "USER".to_string(),..employee}))
+                set_employee.set(Some(Employee{position : Position::User,..employee}))
             }
         }
     });

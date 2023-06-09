@@ -1,14 +1,14 @@
 use bcrypt::BcryptResult;
 use chrono::NaiveDateTime;
-use sqlx::{query, query_as};
+use sqlx::query;
 use uuid::Uuid;
 
 use crate::AppState;
 use rec::{
     crud_sync::{Cd, CdVersion, Table, UpdateVersion},
     model::{
-        employee::{Employee, UpdateEmployee},
-        Update,
+        employee::{Employee, UpdateEmployee, Position},
+        Update, Stringify, FromExt,
     },
 };
 
@@ -40,7 +40,7 @@ pub async fn save(
     VALUES($1,$2,$3,$4,$5,$6,$7,$8);",
         id,
         department_id,
-        position,
+        position.stringify(),
         first_name,
         middle_name,
         last_name,
@@ -64,6 +64,36 @@ pub async fn save(
     Ok(())
 }
 
+pub async fn up(
+    state: &AppState,
+    id: Uuid,
+    env: (Uuid, NaiveDateTime),
+) -> Result<(), Box<dyn std::error::Error>> {
+    let (updater_id, time_stamp) = env;
+    query!(
+        "
+    UPDATE employee SET
+    position = $2
+    WHERE id = $1;",
+        id,
+        Position::SuperUser.stringify()
+    )
+    .execute(&state.db)
+    .await?;
+    record_update_version(
+        &state,
+        UpdateVersion {
+            target_id: id,
+            time_stamp,
+            updater_id,
+            json: Update::Employee(UpdateEmployee::Up(id)),
+            version_number: 0,
+        },
+    )
+    .await?;
+    Ok(())
+}
+
 pub async fn down(
     state: &AppState,
     id: Uuid,
@@ -73,9 +103,10 @@ pub async fn down(
     query!(
         "
     UPDATE employee SET
-    position = 'USER'
+    position = $2
     WHERE id = $1;",
-        id
+        id,
+        Position::User.stringify()
     )
     .execute(&state.db)
     .await?;
@@ -156,35 +187,6 @@ pub async fn update_department(
     Ok(())
 }
 
-pub async fn up(
-    state: &AppState,
-    id: Uuid,
-    env: (Uuid, NaiveDateTime),
-) -> Result<(), Box<dyn std::error::Error>> {
-    let (updater_id, time_stamp) = env;
-    query!(
-        "
-    UPDATE employee SET
-    position = 'SUPER_USER'
-    WHERE id = $1;",
-        id
-    )
-    .execute(&state.db)
-    .await?;
-    record_update_version(
-        &state,
-        UpdateVersion {
-            target_id: id,
-            time_stamp,
-            updater_id,
-            json: Update::Employee(UpdateEmployee::Up(id)),
-            version_number: 0,
-        },
-    )
-    .await?;
-    Ok(())
-}
-
 pub async fn delete(
     state: &AppState,
     id: Uuid,
@@ -219,8 +221,7 @@ pub async fn fetch_employee_by_id(
     state: &AppState,
     id: Uuid,
 ) -> Result<Employee, Box<dyn std::error::Error>> {
-    let row = query_as!(
-        Employee,
+    let record = query!(
         r#"select
       id,
       department_id,
@@ -233,11 +234,18 @@ pub async fn fetch_employee_by_id(
  from employee where id = $1"#,
         id
     )
-    .fetch_one(&state.db);
-    match row.await {
-        Ok(emp) => Ok(emp),
-        Err(err) => Err(err.into()),
-    }
+    .fetch_one(&state.db).await?;
+    let position = Position::ext_from(record.position)?;
+    Ok(Employee {
+        id: record.id,
+        department_id: record.department_id,
+        position,
+        first_name: record.first_name,
+        middle_name: record.middle_name,
+        last_name: record.last_name,
+        card_id: record.card_id,
+        password: record.password
+    })
 }
 
 pub async fn fetch_employee_department_id_by_id(

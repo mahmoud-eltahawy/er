@@ -5,7 +5,7 @@ use rec::{
     crud_sync::Version,
     model::{
         department::{Department, UpdateDepartment},
-        employee::Employee,
+        employee::{Employee, Position},
         machine::Machine,
         spare_part::SparePart,
         Environment, TableCrud, TableRequest,
@@ -62,7 +62,7 @@ pub async fn insert_basic_data(app_state: &AppState) -> Result<(), Box<dyn Error
         first_name: "e".to_string(),
         middle_name: "r".to_string(),
         last_name: "c".to_string(),
-        position: "SUPER_USER".to_string(),
+        position: Position::SuperUser,
         department_id: zero_id,
         password: "1234".to_string(),
     };
@@ -141,7 +141,7 @@ async fn insert_employees(app_state: &AppState) -> Result<(), Box<dyn Error>> {
         middle_name: "جمال".to_string(),
         last_name: "محمد".to_string(),
         password: "1234".to_string(),
-        position: "USER".to_string(),
+        position: Position::User,
     };
 
     let employee2 = Employee {
