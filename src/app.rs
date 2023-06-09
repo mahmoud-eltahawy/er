@@ -33,25 +33,32 @@ pub fn App(cx: Scope) -> impl IntoView {
     let (shift_id, set_shift_id) = create_signal(cx, None::<Uuid>);
     let (permissions, set_permissions) = create_signal(cx, Vec::<PermissionName>::new());
 
-    let is_loggedin = move || {
+    let is_loggedin = move |ids : Option<(Uuid,Uuid)>| {
         spawn_local(async move {
-            if let Ok((employee_id,shift_id)) = invoke::<Empty,(Uuid,Uuid)>("check_login", &Empty).await {
+            let ids = match ids {
+                Some((employee_id,shift_id)) => Ok((employee_id,shift_id)),
+                None => invoke::<Empty,(Uuid,Uuid)>("check_login", &Empty).await
+            };
+            if let Ok((employee_id,shift_id)) = ids {
                 if let (Ok(employee),Ok(permissions)) = (
                     invoke::<Id,Employee>("get_employee_by_id",&Id { id: employee_id } ).await,
                     invoke::<Id,Vec<PermissionName>>("employee_permissions",&Id { id: employee_id } ).await
                 ) {
-                    set_employee(Some(employee));
-                    set_shift_id(Some(shift_id));
-                    set_permissions(permissions);
+                    set_employee.set(Some(employee));
+                    set_shift_id.set(Some(shift_id));
+                    set_permissions.set(permissions);
                 };
             };
         })
     };
 
-    is_loggedin();
+    is_loggedin(None);
+    spawn_local(async move {
+        let _ = invoke::<Empty,()>("update", &Empty).await;
+    });
 
-    listen_to::<()>("new_login".to_string(), move |_| is_loggedin());
-    listen_to::<()>("shift_ended".to_string(), move |_| set_permissions(Vec::new()));
+    listen_to::<(Uuid,Uuid)>("new_login".to_string(), move |e| is_loggedin(Some(e.payload)));
+    listen_to::<()>("shift_ended".to_string(), move |_| set_permissions.set(Vec::new()));
     listen_to::<(Uuid,PermissionName)>("update_employee_allow_permission".to_string(), move |e| {
         let (id,permission) = e.payload;
         if let Some(employee) = employee.get() {
@@ -64,7 +71,7 @@ pub fn App(cx: Scope) -> impl IntoView {
         let (id,permission) = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {
-                set_permissions(permissions.get().into_iter().filter(|x| x != &permission).collect());
+                set_permissions.set(permissions.get().into_iter().filter(|x| x != &permission).collect());
             }
         }
     });
@@ -72,7 +79,7 @@ pub fn App(cx: Scope) -> impl IntoView {
         let id = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {
-                set_permissions(Vec::new());
+                set_permissions.set(Vec::new());
             }
         }
     });
@@ -80,7 +87,7 @@ pub fn App(cx: Scope) -> impl IntoView {
         let id = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {
-                set_employee(Some(Employee{position : "SUPER_USER".to_string(),..employee}))
+                set_employee.set(Some(Employee{position : "SUPER_USER".to_string(),..employee}))
             }
         }
     });
@@ -88,7 +95,7 @@ pub fn App(cx: Scope) -> impl IntoView {
         let id = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {
-                set_employee(Some(Employee{position : "USER".to_string(),..employee}))
+                set_employee.set(Some(Employee{position : "USER".to_string(),..employee}))
             }
         }
     });
@@ -98,7 +105,7 @@ pub fn App(cx: Scope) -> impl IntoView {
     provide_context(cx, permissions);
 
     view! { cx,
-        <main class="container">
+        <main>
             <Show
               fallback=move |cx| view!{cx, <Login/>}
               when=move || matches!(employee.get(),Some(_))

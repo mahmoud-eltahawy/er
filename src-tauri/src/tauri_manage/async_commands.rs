@@ -115,12 +115,12 @@ pub async fn login(
     emp_and_uuid: tauri::State<'_, Mutex<Option<(Uuid, Uuid)>>>,
     app_state: tauri::State<'_, AppState>,
     window: Window,
-    card_id: i64,
+    cardid: i64,
     password: String,
 ) -> Result<(), String> {
-    match helper(&app_state, card_id, password, &window).await {
+    match helper(&app_state, cardid, password, &window).await {
         Ok(result) => {
-            let _ = window.emit("new_login", result.0.clone());
+            let _ = window.emit("new_login", result);
             *emp_and_uuid.lock().unwrap() = Some(result);
             Ok(())
         }

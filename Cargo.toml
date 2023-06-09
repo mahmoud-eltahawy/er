@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["src-tauri","api","rec"]
+members = ["src-tauri","api","rec","models"]
 
 [workspace.dependencies]
 serde = "^1"
@@ -24,7 +24,7 @@ models = { path = "./models" }
 serde = { workspace = true, features = ["derive"] }
 models = { workspace = true }
 uuid = { workspace = true }
-leptos = "0.3"
+leptos = { version = "^0.3" , features = ["stable"]}
 serde-wasm-bindgen = "0.5"
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
 wasm-bindgen-futures = "0.4"
