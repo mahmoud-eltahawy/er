@@ -27,7 +27,7 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
 pub struct Day {
-    pub date: Vec<String>,
+    pub date: (String,String,String),
     //             shift_id  order
     pub shifts: Vec<(Uuid, String)>,
 }

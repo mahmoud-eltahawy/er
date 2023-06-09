@@ -1,8 +1,8 @@
 use rec::model::{permissions::PermissionName, shift::ShiftOrder};
 
-pub fn translate_date(date: String) -> Vec<String> {
+pub fn translate_date(date: String) -> (String,String,String) {
     let date = validate_date(date);
-    return date
+    let date : Vec<String> = date
         .split('-')
         .into_iter()
         .map(|num| {
@@ -15,6 +15,11 @@ pub fn translate_date(date: String) -> Vec<String> {
         })
         .rev()
         .collect();
+    let hash = "$$".to_string();
+    match (date.get(0),date.get(1),date.get(2),) {
+        (Some(a),Some(b),Some(c)) => (a.to_string(),b.to_string(),c.to_string()),
+        _ => (hash.clone(),hash.clone(),hash)
+    }
 }
 
 fn validate_date(date: String) -> String {

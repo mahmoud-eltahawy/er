@@ -5,7 +5,7 @@ use tauri::Window;
 use uuid::Uuid;
 
 #[tauri::command]
-pub fn current_shift() -> Result<(String, Vec<String>), String> {
+pub fn current_shift() -> Result<(String, (String,String,String)), String> {
     let now = get_relative_now();
     let order = get_current_order(now);
     match get_current_date(now) {

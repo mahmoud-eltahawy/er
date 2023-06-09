@@ -6,8 +6,10 @@ use tauri_sys::{tauri::invoke,event::{listen, Event}};
 use uuid::Uuid;
 
 mod login;
+mod shift_identity;
 
 use login::Login;
+use shift_identity::ShiftIdentity;
 
 pub fn listen_to<T : DeserializeOwned + 'static>(event_name : String,action : impl Fn(Event<T>) + 'static) {
     spawn_local(async move {
@@ -57,8 +59,15 @@ pub fn App(cx: Scope) -> impl IntoView {
         let _ = invoke::<Empty,()>("update", &Empty).await;
     });
 
+    let end_the_shift = move |_| {
+        set_employee.set(None);
+        set_shift_id.set(None);
+        set_permissions.set(Vec::new());
+    };
+
+    listen_to::<()>("shift_ended".to_string(), end_the_shift);
+    listen_to::<()>("logout".to_string(), end_the_shift);
     listen_to::<(Uuid,Uuid)>("new_login".to_string(), move |e| is_loggedin(Some(e.payload)));
-    listen_to::<()>("shift_ended".to_string(), move |_| set_permissions.set(Vec::new()));
     listen_to::<(Uuid,PermissionName)>("update_employee_allow_permission".to_string(), move |e| {
         let (id,permission) = e.payload;
         if let Some(employee) = employee.get() {
@@ -106,6 +115,7 @@ pub fn App(cx: Scope) -> impl IntoView {
 
     view! { cx,
         <main>
+            <ShiftIdentity/>
             <Show
               fallback=move |cx| view!{cx, <Login/>}
               when=move || matches!(employee.get(),Some(_))

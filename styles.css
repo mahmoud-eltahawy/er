@@ -1,4 +1,3 @@
-
 .LOGIN {
     display: block;
     border: solid 3px;
@@ -25,4 +24,19 @@
       border: solid 3px;
       margin: 2px auto;
       padding: 2px;
+}
+
+.SHIFT_IDENTITY{
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    fontSize: large;
+}
+
+.SHIFT_IDENTITY div{
+    display: inline-block;
+    fontSize: 18px;
+    margin: 5px auto;
+    padding: 5px;
+    borderBottom: 2px solid;
 }
