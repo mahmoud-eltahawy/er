@@ -7,9 +7,11 @@ use uuid::Uuid;
 
 mod login;
 mod shift_identity;
+mod major_update;
 
 use login::Login;
 use shift_identity::ShiftIdentity;
+use major_update::MajorUpdate;
 
 pub fn listen_to<T : DeserializeOwned + 'static>(event_name : String,action : impl Fn(Event<T>) + 'static) {
     spawn_local(async move {
@@ -116,6 +118,7 @@ pub fn App(cx: Scope) -> impl IntoView {
     view! { cx,
         <main>
             <ShiftIdentity/>
+            <MajorUpdate/>
             <Show
               fallback=move |cx| view!{cx, <Login/>}
               when=move || matches!(employee.get(),Some(_))

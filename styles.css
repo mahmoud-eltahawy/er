@@ -1,3 +1,4 @@
+/*APP COMPONENT MEMEBRS*/
 .LOGIN {
     display: block;
     border: solid 3px;
@@ -39,4 +40,29 @@
     margin: 5px auto;
     padding: 5px;
     borderBottom: 2px solid;
+}
+
+.MAJOR_UPDATE {
+    display: block;
+    backgroundColor: lightyellow;
+    border: 2px solid;
+    borderRadius: 200px;
+    position: absolute;
+    left: 15%;
+    top: 15%;
+    width: 70%;
+    height: 70%;
+}
+
+.MAJOR_UPDATE h1 {
+    fontSize: 28px;
+    margin: 5%;
+    padding: 1%;
+}
+
+
+.MAJOR_UPDATE p {
+    fontSize: 22px;
+    margin: 5%;
+    padding: 1%;
 }
