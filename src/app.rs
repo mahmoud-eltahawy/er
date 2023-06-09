@@ -8,10 +8,12 @@ use uuid::Uuid;
 mod login;
 mod shift_identity;
 mod major_update;
+mod wall;
 
 use login::Login;
 use shift_identity::ShiftIdentity;
 use major_update::MajorUpdate;
+use wall::Wall;
 
 use models::employee::Position;
 
@@ -126,7 +128,7 @@ pub fn App(cx: Scope) -> impl IntoView {
               fallback=move |cx| view!{cx, <Login/>}
               when=move || matches!(employee.get(),Some(_))
             >
-                {view!{cx, <p>{employee.get().unwrap().first_name}</p>}}
+                <Wall/>
             </Show>
         </main>
     }
