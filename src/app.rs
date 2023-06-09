@@ -58,6 +58,7 @@ pub fn App(cx: Scope) -> impl IntoView {
         })
     };
 
+
     is_loggedin(None);
     spawn_local(async move {
         let _ = invoke::<Empty,()>("update", &Empty).await;
