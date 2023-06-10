@@ -5,7 +5,7 @@ use tauri_sys::tauri::invoke;
 use crate::app::Id;
 
 #[component]
-pub fn About(cx : Scope) -> impl IntoView {
+pub fn About(cx : Scope,set_password : WriteSignal<bool>) -> impl IntoView {
     let employee_signal = use_context::<ReadSignal<Option<Employee>>>(cx);
     let employee = move || employee_signal
         .expect("employee signal must be provided")
@@ -83,7 +83,7 @@ pub fn About(cx : Scope) -> impl IntoView {
                 </p>
             </Show>
           </Show>
-          <button class="about-in" on:click=|_| log!("later")>"تغيير كلمة السر"</button>
+          <button class="about-in" on:click=move |_| set_password.update(|x| *x = !*x)>"تغيير كلمة السر"</button>
         </section>
     }
 }

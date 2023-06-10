@@ -33,3 +33,21 @@
       border-top-left-radius: 20px;
       border-bottom-right-radius: 20px;
 }
+
+.PASSWORD_UPDATE{
+    display: block;
+    background-color: lightyellow;
+    border: 2px solid;
+    border-radius: 200px;
+    position: absolute;
+    left: 15%;
+    top: 15%;
+    width: 70%;
+    height: 70%;
+}
+
+.PASSWORD_UPDATE input {
+    font-size: 20px;
+    margin: 5%;
+    padding: 1%;
+}

@@ -174,9 +174,9 @@ async fn change_password_helper(
 pub async fn change_password(
     app_state: tauri::State<'_, AppState>,
     emp_and_uuid: tauri::State<'_, Mutex<Option<(Uuid, Uuid)>>>,
-    employee_id: Uuid,
-    old_password: String,
-    new_password: String,
+    employeeid: Uuid,
+    oldpassword: String,
+    newpassword: String,
 ) -> Result<(), String> {
     let Some((updater_id, _)) = *emp_and_uuid.lock().unwrap() else {
         return Err("null empoyee id".to_string());
@@ -185,9 +185,9 @@ pub async fn change_password(
     match change_password_helper(
         app_state,
         updater_id,
-        employee_id,
-        old_password,
-        new_password
+        employeeid,
+        oldpassword,
+        newpassword
     ).await {
         Ok(_) => Ok(()),
         Err(err) => Err(err.to_string())
