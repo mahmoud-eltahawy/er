@@ -1,3 +1,7 @@
+mod about;
+
+use about::About;
+
 use leptos::*;
 
 
@@ -5,6 +9,8 @@ use leptos::*;
 pub fn Wall(cx : Scope) -> impl IntoView{
 
     view!{cx,
-          <h1>"the wall"</h1>
+          <section>
+            <About/>
+          </section>
     }
 }

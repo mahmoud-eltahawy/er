@@ -1,0 +1,21 @@
+.ABOUT {
+      background-color: lightyellow,
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 15%;
+      height: 8%;
+      padding: .5em;
+      border-right: 2px solid;
+      border-bottom: 2px solid;
+      border-top-right-radius: 20px;
+      border-bottom-left-radius: 20px;
+}
+
+.ABOUT .about-in {
+      display: none;
+}
+
+.ABOUT:hover .about-in {
+      display: inline-block;
+}

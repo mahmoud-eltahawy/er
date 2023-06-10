@@ -200,7 +200,7 @@ pub async fn find_department(
     id: Uuid,
 ) -> Result<Department, String> {
     match find_department_by_id(&app_state.pool, id).await {
-        Ok(days) => Ok(days),
+        Ok(department) => Ok(department),
         Err(err) => Err(err.to_string()),
     }
 }

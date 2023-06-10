@@ -7,7 +7,9 @@ use super::Empty;
 #[component]
 pub fn ShiftIdentity(cx : Scope) -> impl IntoView{
     let shift = create_resource(cx, || (), |_| async move {
-        let Ok((order,(day,month,year))) = invoke::<Empty,(String,(String,String,String))>("current_shift", &Empty).await else {
+        let Ok((order,(day,month,year))) = invoke::<Empty,
+                                                    (String,(String,String,String))
+                                                    >("current_shift", &Empty).await else {
             return None;
         };
         let date = day + " / " + &month + " / " + &year;
