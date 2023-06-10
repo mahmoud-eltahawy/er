@@ -1,8 +1,7 @@
-use futures::{future, StreamExt};
 use leptos::*;
 use models::{employee::Employee, permissions::PermissionName};
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
-use tauri_sys::{tauri::invoke,event::{listen, Event}};
+use serde::{Deserialize, Serialize};
+use tauri_sys::tauri::invoke;
 use uuid::Uuid;
 
 mod login;
@@ -17,16 +16,7 @@ use wall::Wall;
 
 use models::employee::Position;
 
-pub fn listen_to<T : DeserializeOwned + 'static>(event_name : String,action : impl Fn(Event<T>) + 'static) {
-    spawn_local(async move {
-        if let Ok(events) = listen(&event_name).await {
-            events.for_each(|event| {
-                action(event);
-                future::ready(())
-            }).await;
-        }
-    })
-}
+use crate::shared::fun::listen;
 
 #[derive(Serialize, Deserialize)]
 struct Empty;
@@ -72,10 +62,10 @@ pub fn App(cx: Scope) -> impl IntoView {
         set_permissions.set(Vec::new());
     };
 
-    listen_to::<()>("shift_ended".to_string(), end_the_shift);
-    listen_to::<()>("logout".to_string(), end_the_shift);
-    listen_to::<(Uuid,Uuid)>("new_login".to_string(), move |e| is_loggedin(Some(e.payload)));
-    listen_to::<(Uuid,PermissionName)>("update_employee_allow_permission".to_string(), move |e| {
+    listen::<()>("shift_ended".to_string(), end_the_shift);
+    listen::<()>("logout".to_string(), end_the_shift);
+    listen::<(Uuid,Uuid)>("new_login".to_string(), move |e| is_loggedin(Some(e.payload)));
+    listen::<(Uuid,PermissionName)>("update_employee_allow_permission".to_string(), move |e| {
         let (id,permission) = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {
@@ -83,7 +73,7 @@ pub fn App(cx: Scope) -> impl IntoView {
             }
         }
     });
-    listen_to::<(Uuid,PermissionName)>("update_employee_forbid_permission".to_string(), move |e| {
+    listen::<(Uuid,PermissionName)>("update_employee_forbid_permission".to_string(), move |e| {
         let (id,permission) = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {
@@ -91,7 +81,7 @@ pub fn App(cx: Scope) -> impl IntoView {
             }
         }
     });
-    listen_to::<Uuid>("update_employee_forbid_all_permissions".to_string(), move |e| {
+    listen::<Uuid>("update_employee_forbid_all_permissions".to_string(), move |e| {
         let id = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {
@@ -99,7 +89,7 @@ pub fn App(cx: Scope) -> impl IntoView {
             }
         }
     });
-    listen_to::<Uuid>("update_employee_up".to_string(), move |e| {
+    listen::<Uuid>("update_employee_up".to_string(), move |e| {
         let id = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {
@@ -107,7 +97,7 @@ pub fn App(cx: Scope) -> impl IntoView {
             }
         }
     });
-    listen_to::<Uuid>("update_employee_down".to_string(), move |e| {
+    listen::<Uuid>("update_employee_down".to_string(), move |e| {
         let id = e.payload;
         if let Some(employee) = employee.get() {
             if employee.id == id {

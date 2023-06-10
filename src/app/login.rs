@@ -4,6 +4,8 @@ use leptos::leptos_dom::ev::SubmitEvent;
 use tauri_sys::tauri::invoke;
 use serde::{Serialize,Deserialize};
 
+use crate::shared::fun::alert;
+
 #[derive(Serialize,Deserialize)]
 struct LoginArgs {
     cardid : i64,
@@ -20,13 +22,13 @@ pub fn Login(cx : Scope) -> impl IntoView{
         spawn_local(async move {
             let cardid = card_ref.get().unwrap().value().parse().unwrap();
             let password = password_ref.get().unwrap().value();
-            log!("{:#?}",cardid);
-            log!("{:#?}",password);
-            let r = invoke::<LoginArgs,()>("login", &LoginArgs {
+            let res = invoke::<LoginArgs,()>("login", &LoginArgs {
                 cardid,
                 password
             }).await;
-            log!("{:#?}",r);
+            if let Err(_) = res {
+                alert("لم تنجح في تسجيل الدخول");
+            }
         });
     };
 

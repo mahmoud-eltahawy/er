@@ -1,4 +1,5 @@
 mod app;
+mod shared;
 
 use app::*;
 use leptos::*;

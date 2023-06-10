@@ -29,13 +29,11 @@ pub fn About(cx : Scope,set_password : WriteSignal<bool>) -> impl IntoView {
                         else {""})
                     },
                     None => {
-                        log!("department {} does not have boss",department.name);
                         None
                     }
                 }
             },
             None => {
-                log!("no department assigned to the employee");
                 None
             }
         };

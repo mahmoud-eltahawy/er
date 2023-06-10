@@ -1,6 +1,6 @@
 use leptos::*;
 
-use super::listen_to;
+use crate::shared::fun::listen;
 
 #[component]
 pub fn MajorUpdate(cx : Scope) -> impl IntoView {
@@ -8,13 +8,13 @@ pub fn MajorUpdate(cx : Scope) -> impl IntoView {
     let (updates_number,set_updates_number) = create_signal(cx, None::<u64>);
 
 
-    listen_to::<u64>(
+    listen::<u64>(
         "begin_major_update".to_string(),
         move |e| set_updates_number.set(Some(e.payload)));
-    listen_to::<()>(
+    listen::<()>(
         "end_major_update".to_string(),
         move |_| set_updates_number.set(None));
-    listen_to::<(u64,u64)>(
+    listen::<(u64,u64)>(
         "major_update_step".to_string(),
         move |e| set_successes_and_failures.set(e.payload));
 

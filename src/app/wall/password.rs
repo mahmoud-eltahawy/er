@@ -4,6 +4,8 @@ use serde::{Serialize, Deserialize};
 use tauri_sys::tauri::invoke;
 use uuid::Uuid;
 
+use crate::shared::fun::alert;
+
 #[derive(Serialize,Deserialize)]
 struct Args{
   employeeid : Uuid,
@@ -38,7 +40,7 @@ pub fn Password(
           }).await;
           match res {
             Ok(_) => set_password.set(false),
-            Err(err) => log!("{}",err.to_string())
+            Err(_) => alert("حدث خطأ اثناء تحديث كلمة السر")
           }
         })
       }
